@@ -2,7 +2,7 @@
 
 This project is a thread-safe, concurrent web server built using Go's standard `net/http` package. It implements a basic Key-Value store with RESTful endpoints, background monitoring, and graceful shutdown capabilities.
 
-## 🚀 Features
+## Features
 
 * **REST API:** Endpoints to Create, Read, and Delete data.
 * **Thread Safety:** Uses `sync.Mutex` to safely manage shared state (map and counters) across concurrent HTTP requests.
@@ -10,7 +10,7 @@ This project is a thread-safe, concurrent web server built using Go's standard `
 * **Graceful Shutdown:** Captures OS signals (`Ctrl+C`) to shut down background workers and exit cleanly.
 * **Routing:** Utilizes Go 1.22+ `http.NewServeMux` for pattern matching (e.g., `DELETE /data/{key}`).
 
-## 🛠️ specific Requirements Implemented
+## specific Requirements Implemented
 
 1.  **Concurrency:** `net/http` handles requests concurrently; Mutexes protect the critical sections.
 2.  **Coordination:** Channels are used to signal the background worker to stop.
@@ -18,7 +18,7 @@ This project is a thread-safe, concurrent web server built using Go's standard `
 
 ---
 
-## 💻 How to Run
+## How to Run
 
 1.  **Prerequisites:** Ensure you have Go installed (Version 1.22 or higher is required for the URL path matching).
 2.  **Run the Server:**
@@ -32,7 +32,7 @@ This project is a thread-safe, concurrent web server built using Go's standard `
 
 ---
 
-## 🔗 API Endpoints
+## API Endpoints
 
 The server runs on **port 8000**.
 
@@ -87,7 +87,7 @@ Returns the total number of requests processed.
 
 ---
 
-## ⚙️ Internal Architecture
+## Internal Architecture
 
 ### The `Server` Struct
 The core state is managed within the `Server` struct:

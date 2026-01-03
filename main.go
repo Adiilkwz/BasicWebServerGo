@@ -112,7 +112,12 @@ func (s *Server) startBackgroundWorker() {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("Server status update...")
+			s.mu.Lock()
+			count := s.requests
+			size := len(s.data)
+			s.mu.Unlock()
+
+			fmt.Printf("[Worker Log] Requests: %d | Database Size: %d\n", count, size)
 		case <-s.shutDownCh:
 			fmt.Println("Worker Stopped")
 			return

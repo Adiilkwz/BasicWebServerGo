@@ -65,6 +65,29 @@ func (s *Server) getDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) deleteDataHandler(w http.ResponseWriter, r *http.Request) {
+	key := r.PathValue("key")
+
+	if key == "" {
+		http.Error(w, "Key is required", http.StatusBadRequest)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, exists := s.data[key]; !exists {
+		http.Error(w, "Key is not found", http.StatusNotFound)
+		return
+	}
+
+	delete(s.data, key)
+	s.requests++
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Deleted Key: %s", key)
+}
+
 func (s *Server) startBackgroundWorker() {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
@@ -86,6 +109,7 @@ func main() {
 
 	mux.HandleFunc("POST /data", server.postDataHandler)
 	mux.HandleFunc("GET /data", server.getDataHandler)
+	mux.HandleFunc("DELETE /data/{key}", server.deleteDataHandler)
 
 	go server.startBackgroundWorker()
 

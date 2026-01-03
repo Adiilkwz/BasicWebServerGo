@@ -84,8 +84,25 @@ func (s *Server) deleteDataHandler(w http.ResponseWriter, r *http.Request) {
 	delete(s.data, key)
 	s.requests++
 
+	fmt.Printf("Key %s was deleted\n", key)
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Deleted Key: %s", key)
+}
+
+func (s *Server) statsHandler(w http.ResponseWriter, r *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	count := s.requests
+
+	response := map[string]int{
+		"total_requests": count,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode stats", http.StatusInternalServerError)
+	}
 }
 
 func (s *Server) startBackgroundWorker() {
@@ -110,6 +127,7 @@ func main() {
 	mux.HandleFunc("POST /data", server.postDataHandler)
 	mux.HandleFunc("GET /data", server.getDataHandler)
 	mux.HandleFunc("DELETE /data/{key}", server.deleteDataHandler)
+	mux.HandleFunc("GET /stats", server.statsHandler)
 
 	go server.startBackgroundWorker()
 

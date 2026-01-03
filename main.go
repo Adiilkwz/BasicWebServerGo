@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -136,9 +139,21 @@ func main() {
 
 	go server.startBackgroundWorker()
 
-	fmt.Println("Server starting on :8000")
+	go func() {
+		fmt.Println("Server starting on :8000")
+		if err := http.ListenAndServe(":8000", mux); err != nil {
+			fmt.Printf("Server Error: %v\n", err)
+		}
+	}()
 
-	if err := http.ListenAndServe(":8000", mux); err != nil {
-		fmt.Printf("Server failed to start: %v\n", err)
-	}
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+
+	fmt.Println("\nShutting down server...")
+	close(server.shutDownCh)
+
+	time.Sleep(1 * time.Second)
+	fmt.Println("Server exited properly.")
 }
